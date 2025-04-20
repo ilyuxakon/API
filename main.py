@@ -17,11 +17,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.initUI()
 
     def initUI(self):
-        self.search_button.clicked.connect(self.get_map)
+        self.search_button.clicked.connect(self.set_position)
+
+    def set_position(self):
+        if ',' in self.longitude.text():
+            self.X = '.'.join(self.longitude.text().split(','))
+        
+        else:
+            self.X = self.longitude.text()
+
+        if ',' in self.latitude.text():
+            self.Y = '.'.join(self.latitude.text().split(','))
+        
+        else:
+            self.Y = self.latitude.text()
+        
+        self.get_map()
 
     def get_map(self):
         geocoder_api_server = "http://geocode-maps.yandex.ru/1.x/"
-        self.X, self.Y = self.longitude.text(), self.latitude.text()
         geocode = self.X + ', ' + self.Y
 
         geocoder_params = {
@@ -64,16 +78,34 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 def main():
     def pg_up():
         a.Z = str(float(a.Z) * 1.5)
-        print(a.Z)
         a.get_map()
 
     def pg_down():
         a.Z = str(float(a.Z) / 1.5)
-        print(a.Z)
+        a.get_map()
+
+    def up():
+        a.Y = str(float(a.Y) + float(a.Z) * 0.5)
+        a.get_map()
+
+    def down():
+        a.Y = str(float(a.Y) - float(a.Z) * 0.5)
+        a.get_map()
+
+    def left():
+        a.X = str(float(a.X) - float(a.Z) * 0.5)
+        a.get_map()
+
+    def right():
+        a.X = str(float(a.X) + float(a.Z) * 0.5)
         a.get_map()
 
     keyboard.add_hotkey('page up', pg_up)
     keyboard.add_hotkey('page down', pg_down)
+    keyboard.add_hotkey('up', up)
+    keyboard.add_hotkey('down', down)
+    keyboard.add_hotkey('left', left)
+    keyboard.add_hotkey('right', right)
 
     app = QApplication(sys.argv)
     a = MainWindow()
