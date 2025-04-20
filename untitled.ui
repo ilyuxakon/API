@@ -20,12 +20,33 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QDoubleSpinBox" name="longitude"/>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Широта:</string>
+          </property>
+         </widget>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="latitude"/>
+         <widget class="QLineEdit" name="latitude"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Долгота:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="longitude"/>
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="QPushButton" name="search_button">
+        <property name="text">
+         <string>Поиск</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QRadioButton" name="switch_radion_button">
@@ -64,6 +85,9 @@
      <widget class="QLabel" name="label">
       <property name="text">
        <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
       </property>
      </widget>
     </item>
