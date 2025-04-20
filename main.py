@@ -20,7 +20,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
     def initUI(self):
-        self.search_button.clicked.connect(self.get_map)
+        self.search_button.clicked.connect(self.set_position)
         self.switch_check_box.clicked.connect(self.set_theme)
         self.search_button_2.clicked.connect(self.search_obj)
 
