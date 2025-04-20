@@ -8,8 +8,10 @@ from ui_file import Ui_MainWindow
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     Z = '0.05'
-    X = FLAG_X = '0'
-    Y = FLAG_Y = '0'
+    X = '0'
+    Y = '0'
+    FLAG_X = None
+    FLAG_Y = None
     THEME = 'light'
 
 
@@ -23,7 +25,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.search_button.clicked.connect(self.set_position)
         self.switch_check_box.clicked.connect(self.set_theme)
         self.search_button_2.clicked.connect(self.search_obj)
-
+        self.reset.clicked.connect(self.reset_pt)
+    
+    
+    def reset_pt(self):
+        self.FLAG_X, self.FLAG_Y = None, None
+        self.get_map()
+        
 
     def set_theme(self):
         if self.switch_check_box.isChecked():
@@ -104,8 +112,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             "spn": ",".join([self.Z, self.Z]),
             "theme": self.THEME,
             "apikey": "f3a0fe3a-b07e-4840-a1da-06f18b2ddf13",
-            "pt": self.FLAG_X + ',' + self.FLAG_Y + ',flag'
         }
+        
+        if self.FLAG_X is not None:
+            map_params['pt'] = self.FLAG_X + ',' + self.FLAG_Y + ',flag'
 
         map_api_server = "https://static-maps.yandex.ru/v1"
 
