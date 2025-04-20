@@ -49,7 +49,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="switch_radion_button">
+       <widget class="QCheckBox" name="switch_check_box">
         <property name="text">
          <string>Светлая</string>
         </property>

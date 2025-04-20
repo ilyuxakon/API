@@ -10,14 +10,31 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     Z = '0.05'
     X = '0'
     Y = '0'
+    THEME = 'light'
+
 
     def __init__(self):
         super().__init__()
         self.setupUi(self)
         self.initUI()
 
+
     def initUI(self):
         self.search_button.clicked.connect(self.set_position)
+        self.switch_check_box.clicked.connect(self.set_theme)
+
+
+    def set_theme(self):
+        if self.switch_check_box.isChecked():
+            self.THEME = 'dark'
+            self.switch_check_box.setText('Тёмная')
+
+        else:
+            self.THEME = 'light'
+            self.switch_check_box.setText('Светлая')
+
+        self.get_map()
+
 
     def set_position(self):
         if ',' in self.longitude.text():
@@ -33,6 +50,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.Y = self.latitude.text()
         
         self.get_map()
+
 
     def get_map(self):
         geocoder_api_server = "http://geocode-maps.yandex.ru/1.x/"
@@ -59,6 +77,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         map_params = {
             "ll": ",".join([toponym_longitude, toponym_lattitude]),
             "spn": ",".join([self.Z, self.Z]),
+            "theme": self.THEME,
             "apikey": "f3a0fe3a-b07e-4840-a1da-06f18b2ddf13"
         }
 
