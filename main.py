@@ -102,7 +102,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             "ll": ",".join([toponym_longitude, toponym_lattitude]),
             "spn": ",".join([self.Z, self.Z]),
             "theme": self.THEME,
-            "apikey": "f3a0fe3a-b07e-4840-a1da-06f18b2ddf13"
+            "apikey": "f3a0fe3a-b07e-4840-a1da-06f18b2ddf13",
+            "pt": self.X + ',' + self.Y + ',flag'
         }
 
         map_api_server = "https://static-maps.yandex.ru/v1"
