@@ -1,5 +1,6 @@
 import sys
 import requests
+import keyboard
 from PyQt6.QtWidgets import QApplication, QMainWindow
 from PyQt6.QtGui import QPixmap
 from ui_file import Ui_MainWindow
@@ -7,6 +8,8 @@ from ui_file import Ui_MainWindow
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     Z = '0.05'
+    X = '0'
+    Y = '0'
 
     def __init__(self):
         super().__init__()
@@ -18,7 +21,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def get_map(self):
         geocoder_api_server = "http://geocode-maps.yandex.ru/1.x/"
-        geocode = self.longitude.text() + ', ' + self.latitude.text()
+        self.X, self.Y = self.longitude.text(), self.latitude.text()
+        geocode = self.X + ', ' + self.Y
+
         geocoder_params = {
             "apikey": "8013b162-6b42-4997-9691-77b7074026e0",
             "geocode": geocode,
@@ -56,8 +61,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.label.setPixmap(self.pixmap)
 
 
-if __name__ == '__main__':
+def main():
+    def pg_up():
+        a.Z = str(float(a.Z) * 1.5)
+        print(a.Z)
+        a.get_map()
+
+    def pg_down():
+        a.Z = str(float(a.Z) / 1.5)
+        print(a.Z)
+        a.get_map()
+
+    keyboard.add_hotkey('page up', pg_up)
+    keyboard.add_hotkey('page down', pg_down)
+
     app = QApplication(sys.argv)
     a = MainWindow()
     a.show()
     sys.exit(app.exec())
+
+
+if __name__ == '__main__':
+    main()
