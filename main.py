@@ -8,8 +8,8 @@ from ui_file import Ui_MainWindow
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     Z = '0.05'
-    X = '0'
-    Y = '0'
+    X = FLAG_X = '0'
+    Y = FLAG_Y = '0'
     THEME = 'light'
 
 
@@ -50,6 +50,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.Y = self.latitude.text()
         
+        self.FLAG_X, self.FLAG_Y = self.X, self.Y
         self.get_map()
 
 
@@ -68,7 +69,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         json = response.json()
         toponym = json["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
         toponym_coodrinates = toponym["Point"]["pos"]
-        self.X, self.Y = toponym_coodrinates.split(" ")
+        self.X, self.Y = self.FLAG_X, self.FLAG_Y = toponym_coodrinates.split(" ")
         self.longitude.setText(self.X)
         self.latitude.setText(self.Y)
 
@@ -103,7 +104,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             "spn": ",".join([self.Z, self.Z]),
             "theme": self.THEME,
             "apikey": "f3a0fe3a-b07e-4840-a1da-06f18b2ddf13",
-            "pt": self.X + ',' + self.Y + ',flag'
+            "pt": self.FLAG_X + ',' + self.FLAG_Y + ',flag'
         }
 
         map_api_server = "https://static-maps.yandex.ru/v1"
