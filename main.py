@@ -13,6 +13,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     FLAG_X = None
     FLAG_Y = None
     THEME = 'light'
+    ADDRESS = ''
 
 
     def __init__(self):
@@ -30,6 +31,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     def reset_pt(self):
         self.FLAG_X, self.FLAG_Y = None, None
+        self.ADDRESS = ""
         self.get_map()
         
 
@@ -59,7 +61,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.Y = self.latitude.text()
         
         self.FLAG_X, self.FLAG_Y = self.X, self.Y
-        self.get_map()
+        self.get_map(flag=True)
 
 
     def search_obj(self):
@@ -77,14 +79,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         json = response.json()
         toponym = json["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
         toponym_coodrinates = toponym["Point"]["pos"]
+        self.ADDRESS = toponym['metaDataProperty']['GeocoderMetaData']['text']
         self.X, self.Y = self.FLAG_X, self.FLAG_Y = toponym_coodrinates.split(" ")
+        self.address.setText(self.ADDRESS)
         self.longitude.setText(self.X)
         self.latitude.setText(self.Y)
 
         self.get_map()
 
 
-    def get_map(self):
+    def get_map(self, flag=False):
         geocoder_api_server = "http://geocode-maps.yandex.ru/1.x/"
         geocode = self.X + ', ' + self.Y
 
@@ -106,6 +110,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.search.setText(name)
         toponym_coodrinates = toponym["Point"]["pos"]
         toponym_longitude, toponym_lattitude = toponym_coodrinates.split(" ")
+
+        if flag:
+            self.ADDRESS = toponym['metaDataProperty']['GeocoderMetaData']['text']
+        self.address.setText(self.ADDRESS)
 
         map_params = {
             "ll": ",".join([toponym_longitude, toponym_lattitude]),
