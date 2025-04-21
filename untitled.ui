@@ -75,12 +75,12 @@
       <item>
        <widget class="QLabel" name="address">
         <property name="text">
-         <string>TextLabel</string>
+         <string/>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="post_code_radio_button">
+       <widget class="QCheckBox" name="post_cod_check_box">
         <property name="text">
          <string>Почтовый индекс</string>
         </property>

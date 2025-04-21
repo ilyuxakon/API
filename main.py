@@ -14,12 +14,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     FLAG_Y = None
     THEME = 'light'
     ADDRESS = ''
+    POST_CODE = False
 
 
     def __init__(self):
         super().__init__()
         self.setupUi(self)
         self.initUI()
+        self.get_map(flag=True)
 
 
     def initUI(self):
@@ -27,11 +29,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.switch_check_box.clicked.connect(self.set_theme)
         self.search_button_2.clicked.connect(self.search_obj)
         self.reset.clicked.connect(self.reset_pt)
+        self.post_cod_check_box.clicked.connect(self.set_post_code)
     
     
+    def set_post_code(self):
+        self.POST_CODE = self.post_cod_check_box.isChecked()
+        self.get_map(flag=True)
+        
+        
     def reset_pt(self):
         self.FLAG_X, self.FLAG_Y = None, None
         self.ADDRESS = ""
+        self.POST_CODE = False
         self.get_map()
         
 
@@ -80,6 +89,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         toponym = json["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
         toponym_coodrinates = toponym["Point"]["pos"]
         self.ADDRESS = toponym['metaDataProperty']['GeocoderMetaData']['text']
+        
+        if self.POST_CODE and 'Address' in toponym['metaDataProperty']['GeocoderMetaData'] and\
+           'postal_code' in toponym['metaDataProperty']['GeocoderMetaData']['Address']:
+            self.ADDRESS += '\n' + toponym['metaDataProperty']['GeocoderMetaData']['Address']['postal_code']
+            
         self.X, self.Y = self.FLAG_X, self.FLAG_Y = toponym_coodrinates.split(" ")
         self.address.setText(self.ADDRESS)
         self.longitude.setText(self.X)
@@ -113,8 +127,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         if flag:
             self.ADDRESS = toponym['metaDataProperty']['GeocoderMetaData']['text']
+            if self.POST_CODE and 'Address' in toponym['metaDataProperty']['GeocoderMetaData'] and\
+               'postal_code' in toponym['metaDataProperty']['GeocoderMetaData']['Address']:
+                self.ADDRESS += '\n' + toponym['metaDataProperty']['GeocoderMetaData']['Address']['postal_code']
         self.address.setText(self.ADDRESS)
-
+            
+            
         map_params = {
             "ll": ",".join([toponym_longitude, toponym_lattitude]),
             "spn": ",".join([self.Z, self.Z]),
