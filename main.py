@@ -1,8 +1,10 @@
 import sys
 import requests
 import keyboard
+import math
 from PyQt6.QtWidgets import QApplication, QMainWindow
 from PyQt6.QtGui import QPixmap, QCursor
+from PyQt6.QtCore import Qt
 from ui_file import Ui_MainWindow
 
 
@@ -34,7 +36,119 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.post_cod_check_box.clicked.connect(self.set_post_code)
 
     
+    def right_click(self):
+        pos = self.get_coord_click()
+        
+        if not pos:
+            return
+        
+        x, y = pos
+        
+        server = 'https://search-maps.yandex.ru/v1/'
+        apikey = 'dda3ddba-c9ea-4ead-9010-f43fbc15c6e3'
+        
+        params = {
+            'apikey': apikey,
+            'lang': 'ru_RU',
+            'text': 'организация',
+            'll': x + ',' + y,
+            'spn': '0.1,0.1',
+            'type': 'biz'
+        }
+        
+        response = requests.get(server, params=params)
+
+        if not response:
+            return
+        
+        response = response.json()
+        
+        if len(response['features']) == 0:
+            return
+        
+        org_pos = response['features'][0]['geometry']['coordinates']
+        
+        float_pos = (float(pos[0]), float(pos[1]))
+        float_org_pos = (float(org_pos[0]), float(org_pos[1]))
+        
+        if self.lonlat_distance(float_pos, float_org_pos) > 1000:
+            return
+        
+        params = {
+            'geocode': str(org_pos[0]) + ', ' + str(org_pos[1]),
+            'sco': 'longlat'
+        }
+        
+        pos, name, address, post_code = self.search_obj(params)
+        
+        self.ADDRESS = address
+        self.ADDRESS_FLAG = True
+        self.POST_CODE = post_code
+        self.FLAG_X = self.X = str(pos[0])
+        self.FLAG_Y = self.Y = str(pos[1])
+        self.search.setText(name)
+        
+        params = {
+            'll': ','.join([str(i) for i in pos]),
+            'pt': ','.join([str(i) for i in pos]) + ',flag'
+        }
+        self.get_map(params)
+        
+    
+    def lonlat_distance(self, a, b):
+        degree_to_meters_factor = 111 * 1000 # 111 километров в метрах
+        a_lon, a_lat = a
+        b_lon, b_lat = b
+
+        # Берем среднюю по широте точку и считаем коэффициент для нее.
+        radians_lattitude = math.radians((a_lat + b_lat) / 2.)
+        lat_lon_factor = math.cos(radians_lattitude)
+
+        # Вычисляем смещения в метрах по вертикали и горизонтали.
+        dx = abs(a_lon - b_lon) * degree_to_meters_factor * lat_lon_factor
+        dy = abs(a_lat - b_lat) * degree_to_meters_factor
+
+        # Вычисляем расстояние между точками.
+        distance = math.sqrt(dx * dx + dy * dy)
+
+        return distance
+
+
     def click(self):
+        pos = self.get_coord_click()
+        
+        if not pos:
+            return
+        
+        x, y = pos
+        params = {
+            'geocode': x + ', ' + y,
+            'sco': 'longlat'
+        }
+        
+        pos, name, address, post_code = self.search_obj(params)
+        
+        self.ADDRESS = address
+        self.ADDRESS_FLAG = True
+        self.POST_CODE = post_code
+        self.FLAG_X = str(pos[0])
+        self.FLAG_Y = str(pos[1])
+        self.search.setText(name)
+        
+        params = {
+            'll': self.X + ',' + self.Y,
+            'pt': ','.join([str(i) for i in pos]) + ',flag'
+        }
+        self.get_map(params)
+
+        if self.ADDRESS != '':
+            self.address.setText(self.ADDRESS)
+        
+        if self.POST_CODE_FLAG and self.POST_CODE != '':
+            self.address.setText(f'{self.address.text()}\n{self.POST_CODE}')
+    
+    
+    def get_coord_click(self):
         pos = self.label.mapFromGlobal(QCursor().pos())
         if 0 <= pos.x() <= 600 and\
            0 <= pos.y() <= 450:
@@ -42,33 +156,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             y = pos.y() - 225
             x = str(float(self.X) + x * (float(self.Z) / 150))
             y = str(float(self.Y) - y * (float(self.Z) / 225))
-            
-            params = {
-                'geocode': x + ', ' + y,
-                'sco': 'longlat'
-            }
-            
-            pos, name, address, post_code = self.search_obj(params)
-            
-            self.ADDRESS = address
-            self.ADDRESS_FLAG = True
-            self.POST_CODE = post_code
-            self.FLAG_X = None
-            self.FLAG_Y = None
-            self.search.setText(name)
-            
-            params = {
-                'll': self.X + ',' + self.Y,
-                'pt': ','.join([str(i) for i in pos]) + ',flag'
-            }
-            self.get_map(params)
-
-            if self.ADDRESS != '':
-                self.address.setText(self.ADDRESS)
-            
-            if self.POST_CODE_FLAG and self.POST_CODE != '':
-                self.address.setText(f'{self.address.text()}\n{self.POST_CODE}')
-            
+            return x, y
+        
+        return False
+    
+    
     def set_theme(self):
         if self.THEME == 'light':
             self.THEME = 'dark'
@@ -217,7 +309,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     
     def mousePressEvent(self, event):
-        self.click()
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.click()
+            
+        elif event.button() == Qt.MouseButton.RightButton:
+            self.right_click()
 
 
 def main():
