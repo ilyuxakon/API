@@ -12,7 +12,8 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1029, 640)
+        MainWindow.resize(853, 460)
+        MainWindow.setMaximumSize(QtCore.QSize(9999999, 460))
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.centralwidget)
@@ -58,6 +59,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.post_cod_check_box)
         self.horizontalLayout.addLayout(self.verticalLayout)
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
+        self.label.setMinimumSize(QtCore.QSize(0, 0))
         self.label.setText("")
         self.label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.label.setObjectName("label")
